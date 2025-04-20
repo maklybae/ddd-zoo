@@ -23,6 +23,10 @@ const (
 	FeedingStatusNotDone FeedingStatus = false
 )
 
+func (fst FeedingScheduleTime) IsReady(now time.Time) bool {
+	return time.Time(fst).Before(now)
+}
+
 func (fs FeedingStatus) Done() (newFeedingStatus FeedingStatus, err error) {
 	if fs == FeedingStatusDone {
 		return FeedingStatusDone, ErrFeedingStatusIsDone
@@ -55,4 +59,8 @@ func (fs *FeedingSchedule) Done() error {
 	fs.Status = status
 
 	return nil
+}
+
+func (fs *FeedingSchedule) IsReady(now time.Time) bool {
+	return fs.Status == FeedingStatusNotDone && fs.Time.IsReady(now)
 }
