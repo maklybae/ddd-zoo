@@ -8,6 +8,10 @@ type TimeProvider interface {
 
 type RealTimeProvider struct{}
 
+func NewRealTimeProvider() *RealTimeProvider {
+	return &RealTimeProvider{}
+}
+
 func (p *RealTimeProvider) Now() time.Time {
 	return time.Now()
 }

@@ -16,20 +16,20 @@ type FeedingOrganizationService interface {
 type FeedingOrganization struct {
 	animalRepository          domain.AnimalRepository
 	feedingScheduleRepository domain.FeedingScheduleRepository
-	eventHandler              events.EventHandler
+	eventDispatcher           events.Dispatcher
 	timeProvider              TimeProvider
 }
 
 func NewFeedingOrganization(
 	animalRepository domain.AnimalRepository,
 	feedingScheduleRepository domain.FeedingScheduleRepository,
-	eventHandler events.EventHandler,
+	eventDispatcher events.Dispatcher,
 	timeProvider TimeProvider,
 ) *FeedingOrganization {
 	return &FeedingOrganization{
 		animalRepository:          animalRepository,
 		feedingScheduleRepository: feedingScheduleRepository,
-		eventHandler:              eventHandler,
+		eventDispatcher:           eventDispatcher,
 		timeProvider:              timeProvider,
 	}
 }
@@ -53,9 +53,7 @@ func (fo *FeedingOrganization) FeedAll(ctx context.Context, now time.Time) error
 				Timestamp:     fo.timeProvider.Now(),
 			}
 
-			if err := fo.eventHandler.Handle(ctx, &feedingEvent); err != nil {
-				return fmt.Errorf("publishing feeding time event: %w", err)
-			}
+			fo.eventDispatcher.Dispatch(ctx, &feedingEvent)
 
 			if err := feedingSchedule.Animal.Feed(feedingSchedule.Food); err != nil {
 				return fmt.Errorf("feeding animal: %w", err)

@@ -1,6 +1,9 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type AnimalRepository interface {
 	GetAnimal(ctx context.Context, id AnimalID) (animal *Animal, err error)
@@ -10,6 +13,9 @@ type AnimalRepository interface {
 	GetAllAnimals(ctx context.Context) (animals []*Animal, err error)
 
 	CountAnimals(ctx context.Context) (count int, err error)
+	GetAnimalsByEnclosure(ctx context.Context, enclosureID EnclosureID) ([]*Animal, error)
+	CountHealthyAnimals(ctx context.Context) (count int, err error)
+	CountSickAnimals(ctx context.Context) (count int, err error)
 }
 
 type EnclosureRepository interface {
@@ -21,6 +27,8 @@ type EnclosureRepository interface {
 
 	CountEnclosures(ctx context.Context) (count int, err error)
 	CountFreeEnclosures(ctx context.Context) (count int, err error)
+	GetEnclosuresByType(ctx context.Context, enclosureType EnclosureType) ([]*Enclosure, error)
+	GetEnclosuresWithSpace(ctx context.Context) ([]*Enclosure, error)
 }
 
 type FeedingScheduleRepository interface {
@@ -31,4 +39,10 @@ type FeedingScheduleRepository interface {
 	GetAllFeedingSchedules(ctx context.Context) (feedingSchedules []*FeedingSchedule, err error)
 
 	CountFeedingSchedules(ctx context.Context) (count int, err error)
+	GetFeedingSchedulesForAnimal(ctx context.Context, animalID AnimalID) ([]*FeedingSchedule, error)
+	GetCompletedFeedingSchedules(ctx context.Context) ([]*FeedingSchedule, error)
+	GetPendingFeedingSchedules(ctx context.Context) ([]*FeedingSchedule, error)
+	GetFeedingSchedulesForTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*FeedingSchedule, error)
+	CountCompletedFeedingsToday(ctx context.Context, now time.Time) (int, error)
+	CountPendingFeedingsToday(ctx context.Context, now time.Time) (int, error)
 }

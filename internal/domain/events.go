@@ -2,6 +2,8 @@ package domain
 
 import (
 	"time"
+
+	"github.com/maklybae/ddd-zoo/pkg/events"
 )
 
 // AnimalMovedEvent is triggered when an animal is moved to a new enclosure.
@@ -14,7 +16,9 @@ type AnimalMovedEvent struct {
 	Timestamp     time.Time
 }
 
-func (e *AnimalMovedEvent) EventName() string {
+var _ events.Event = (*AnimalMovedEvent)(nil)
+
+func (e *AnimalMovedEvent) Name() string {
 	return "animal.moved"
 }
 
@@ -29,6 +33,8 @@ type FeedingTimeEvent struct {
 	Timestamp     time.Time
 }
 
-func (e *FeedingTimeEvent) EventName() string {
+var _ events.Event = (*FeedingTimeEvent)(nil)
+
+func (e *FeedingTimeEvent) Name() string {
 	return "feeding.time"
 }

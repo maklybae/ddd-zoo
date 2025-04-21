@@ -15,20 +15,20 @@ type AnimalTransferService interface {
 type AnimalTransfer struct {
 	animalRepository    domain.AnimalRepository
 	enclosureRepository domain.EnclosureRepository
-	eventHandler        events.EventHandler
+	eventDispatcher     events.Dispatcher
 	timeProvider        TimeProvider
 }
 
 func NewAnimalTransfer(
 	animalRepository domain.AnimalRepository,
 	enclosureRepository domain.EnclosureRepository,
-	eventHandler events.EventHandler,
+	eventDispatcher events.Dispatcher,
 	timeProvider TimeProvider,
 ) *AnimalTransfer {
 	return &AnimalTransfer{
 		animalRepository:    animalRepository,
 		enclosureRepository: enclosureRepository,
-		eventHandler:        eventHandler,
+		eventDispatcher:     eventDispatcher,
 		timeProvider:        timeProvider,
 	}
 }
@@ -77,9 +77,7 @@ func (at *AnimalTransfer) TransferAnimal(ctx context.Context, animalID domain.An
 		Timestamp:     at.timeProvider.Now(),
 	}
 
-	if err := at.eventHandler.Handle(ctx, &movedEvent); err != nil {
-		return fmt.Errorf("publishing animal moved event: %w", err)
-	}
+	at.eventDispatcher.Dispatch(ctx, &movedEvent)
 
 	return nil
 }

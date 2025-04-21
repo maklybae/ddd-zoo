@@ -22,6 +22,14 @@ type (
 	BirthDate time.Time
 )
 
+func (aid AnimalID) String() string {
+	return uuid.UUID(aid).String()
+}
+
+func (aid AnimalID) UUID() uuid.UUID {
+	return uuid.UUID(aid)
+}
+
 const (
 	AnimalStatusHealthy AnimalStatus = iota
 	AnimalStatusSick
@@ -35,6 +43,7 @@ const (
 type Animal struct {
 	ID           AnimalID
 	Name         AnimalName
+	Gender       Gender
 	Species      AnimalSpecies
 	BirthDate    BirthDate
 	FavoriteFood Food

@@ -2,5 +2,5 @@ package events
 
 // Event interface that should be implemented by events.
 type Event interface {
-	EventName() string
+	Name() string
 }

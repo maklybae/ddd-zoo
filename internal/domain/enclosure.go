@@ -19,6 +19,14 @@ type (
 	EnclosureSize int
 )
 
+func (eid EnclosureID) String() string {
+	return uuid.UUID(eid).String()
+}
+
+func (eid EnclosureID) UUID() uuid.UUID {
+	return uuid.UUID(eid)
+}
+
 // Value Object.
 type EnclosureOccupancy struct {
 	Capacity int

@@ -18,6 +18,14 @@ type (
 	FeedingStatus       bool
 )
 
+func (fsid FeedingScheduleID) String() string {
+	return uuid.UUID(fsid).String()
+}
+
+func (fsid FeedingScheduleID) UUID() uuid.UUID {
+	return uuid.UUID(fsid)
+}
+
 const (
 	FeedingStatusDone    FeedingStatus = true
 	FeedingStatusNotDone FeedingStatus = false
