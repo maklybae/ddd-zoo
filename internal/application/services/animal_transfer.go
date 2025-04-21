@@ -5,17 +5,31 @@ import (
 	"fmt"
 
 	"github.com/maklybae/ddd-zoo/internal/domain"
+	"github.com/maklybae/ddd-zoo/pkg/events"
 )
+
+type AnimalTransferService interface {
+	TransferAnimal(ctx context.Context, animalID domain.AnimalID, toEnclosureID domain.EnclosureID) error
+}
 
 type AnimalTransfer struct {
 	animalRepository    domain.AnimalRepository
 	enclosureRepository domain.EnclosureRepository
+	eventHandler        events.EventHandler
+	timeProvider        TimeProvider
 }
 
-func NewAnimalTransfer(animalRepository domain.AnimalRepository, enclosureRepository domain.EnclosureRepository) *AnimalTransfer {
+func NewAnimalTransfer(
+	animalRepository domain.AnimalRepository,
+	enclosureRepository domain.EnclosureRepository,
+	eventHandler events.EventHandler,
+	timeProvider TimeProvider,
+) *AnimalTransfer {
 	return &AnimalTransfer{
 		animalRepository:    animalRepository,
 		enclosureRepository: enclosureRepository,
+		eventHandler:        eventHandler,
+		timeProvider:        timeProvider,
 	}
 }
 
@@ -29,6 +43,9 @@ func (at *AnimalTransfer) TransferAnimal(ctx context.Context, animalID domain.An
 	if err != nil {
 		return fmt.Errorf("getting enclosure: %w", err)
 	}
+
+	// Store the old enclosure for the event
+	fromEnclosure := animal.Enclosure
 
 	if err = animal.Enclosure.RemoveAnimal(animal); err != nil {
 		return fmt.Errorf("removing animal from enclosure: %w", err)
@@ -48,6 +65,20 @@ func (at *AnimalTransfer) TransferAnimal(ctx context.Context, animalID domain.An
 
 	if err := at.enclosureRepository.UpdateEnclosure(ctx, toEnclosure); err != nil {
 		return err
+	}
+
+	// Publish the AnimalMovedEvent
+	movedEvent := domain.AnimalMovedEvent{
+		AnimalID:      animal.ID,
+		AnimalName:    animal.Name,
+		AnimalSpecies: animal.Species,
+		FromEnclosure: fromEnclosure,
+		ToEnclosure:   toEnclosure,
+		Timestamp:     at.timeProvider.Now(),
+	}
+
+	if err := at.eventHandler.Handle(ctx, &movedEvent); err != nil {
+		return fmt.Errorf("publishing animal moved event: %w", err)
 	}
 
 	return nil

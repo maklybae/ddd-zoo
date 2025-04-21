@@ -7,6 +7,13 @@ import (
 	"github.com/maklybae/ddd-zoo/internal/domain"
 )
 
+type ZooStatisticsService interface {
+	GetAnimalCount(ctx context.Context) (int, error)
+	GetEnclosureCount(ctx context.Context) (int, error)
+	GetFreeEnclosureCount(ctx context.Context) (int, error)
+	GetFeedingScheduleCount(ctx context.Context) (int, error)
+}
+
 type ZooStatistics struct {
 	animalRepository          domain.AnimalRepository
 	enclosureRepository       domain.EnclosureRepository
