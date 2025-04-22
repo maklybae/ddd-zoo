@@ -45,7 +45,7 @@ func (server *Server) PostApiV1Animals(c *gin.Context) {
 		return
 	}
 
-	enclosure, err := server.enclosureRepo.GetEnclosure(c.Request.Context(), animal.Enclosure.ID)
+	enclosure, err := server.enclosureRepo.GetEnclosure(c.Request.Context(), domain.EnclosureID(input.EnclosureId))
 	if err != nil {
 		server.SendBadRequestResponse(c, err, nil)
 		return

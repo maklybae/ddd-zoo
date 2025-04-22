@@ -16,6 +16,9 @@ import (
 	httpserver "github.com/maklybae/ddd-zoo/internal/presentation/http"
 	v1 "github.com/maklybae/ddd-zoo/internal/types/openapi/v1"
 	"github.com/maklybae/ddd-zoo/pkg/events"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -47,8 +50,15 @@ func main() {
 	// Initialize Gin router
 	router := gin.Default()
 
+	// Serve OpenAPI specification file statically
+	router.StaticFile("/api/openapi.yaml", "./api/openapi/v1/ddd_zoo.yaml")
+
 	// Register OpenAPI handlers
 	v1.RegisterHandlers(router, server)
+
+	// Setup Swagger UI using our OpenAPI specification
+	url := ginSwagger.URL("/api/openapi.yaml") // The URL pointing to API definition
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	// Configure and start HTTP server
 	srv := &http.Server{

@@ -4,10 +4,10 @@ COVERAGE_FILE ?= coverage.out
 build: build_zoo
 
 .PHONY: build_zoo
-build_bot:
+build_zoo:
 	@echo "Running build"
 	@mkdir -p .bin
-	@go build -o ./bin/bot ./cmd/bot
+	@go build -o ./bin/ddd_zoo ./cmd/ddd_zoo
 
 ## test: run all tests
 .PHONY: test
